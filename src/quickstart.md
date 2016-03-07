@@ -1,8 +1,10 @@
 Getting Started
 ---------------
 
+For developers familiar with Javascript tools.
+
 Phosphor provides flexible classes to easily produce a desktop-like experience.
-To start using PhosphorJS the following example print the popular "Hello World"
+As introduction to PhosphorJS the following example prints the popular "Hello World"
 message inside two resizable panels.
 
 PhosphorJS is a set of javascript libraries, as such it can be used with any
