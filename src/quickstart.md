@@ -84,8 +84,8 @@ produce `bundle.js`, this file can then be inserted in your `index.html` file:
 </html>
 ```
 
-The HTML file also imports a style sheet, otherwise when the page is viewed int
-eh browser there will be a blank page only. This simple css files sets the
+The HTML file also imports a style sheet, otherwise when the page is viewed in
+the browser there will be a blank page only. This simple css files sets the
 background color, the font size and the initial minimal size of the panels:
 
 ```css
