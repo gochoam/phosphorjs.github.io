@@ -1,12 +1,6 @@
 The PhosphorJS Project
 ======================
 
-Test
-----
-
-Just a simple test to see if the markdow is automatically translated into HTML
-by the scripts.
-
 
 What?
 -----
