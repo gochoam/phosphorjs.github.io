@@ -45,8 +45,7 @@ Use `npm` to Install the required packages to build your bundle with `webpack`:
 ```
 npm install -g webpack typescript
 
-npm install --save phosphor-dockpanel phosphor-widget css-loader style-loader
-ts-loader
+npm install --save phosphor-dockpanel phosphor-widget css-loader style-loader ts-loader
 ```
 
 The corresponding configuration file `webpack.config.json` looks like this:
