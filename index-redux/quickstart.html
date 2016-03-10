@@ -13,21 +13,10 @@
         <link rel="stylesheet" href="css/normalize.min.css">
         <link rel="stylesheet" href="css/main.css">
 
-        <link
-        href="http://alexgorbatchev.com/pub/sh/current/styles/shThemeDefault.css"
-        rel="stylesheet" type="text/css" />
-        <script
-        src="http://alexgorbatchev.com/pub/sh/current/scripts/shCore.js"
-        type="text/javascript"></script>
-        <script
-        src="http://alexgorbatchev.com/pub/sh/current/scripts/shAutoloader.js"
-        type="text/javascript"></script>
-        <script
-        src="http://alexgorbatchev.com/pub/sh/current/scripts/shBrushJScript.js"
-        type="text/javascript"></script>
-        <script
-        src="http://alexgorbatchev.com/pub/sh/current/scripts/shBrushXml.js"
-        type="text/javascript"></script>
+        <link rel="stylesheet" href="highlight/styles/paraiso-light.css">
+        <script src="highlight/highlight.pack.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+
 
 
         <!--[if lt IE 9]>
@@ -81,10 +70,10 @@ typescript, the content is later bundled for the browser with webpack.
 </p>
 
 <p>
-This is the content of `index.ts`:
+This is the content of "index.ts":
 </p>
 
-<pre class="brush: js">
+<pre><code class = "typescript">
 'use strict';
 
 import {
@@ -108,24 +97,24 @@ panel.insertLeft(w1);
 panel.insertRight(w2);
 
 window.onload = () => { panel.attach(document.body); };
-</pre>
+</code></pre>
 
-<p>
-Use `npm` to Install the required packages to build your bundle with `webpack`:
+<p> Use <tt>npm</tt> to Install the required packages to build your bundle
+with <tt>webpack</tt>:
 </p>
 
-<pre>
+<pre><code class="bash">
 npm install -g webpack typescript
 
 npm install --save phosphor-dockpanel phosphor-widget css-loader style-loader
 ts-loader
-</pre>
+</code></pre>
 
 <p>
-The corresponding configuration file `webpack.config.json` looks like this:
+The corresponding configuration file "webpack.config.json" looks like this:
 </p>
 
-<pre>
+<pre><code class="json">
 module.exports = {
   entry: './index.ts',
   output: {
@@ -142,25 +131,24 @@ module.exports = {
     ]
   }
 }
-</pre>
+</code></pre>
 
 <p>
-At this point running `webpack` inside the current working directory will
-produce `bundle.js`, this file can then be inserted in your `index.html` file:
+At this point running <tt>webpack</tt> inside the current working directory will
+produce "bundle.js", this file can then be inserted in your "index.html" file:
 </p>
 
-<script type="syntaxhighlighter" class="brush: html">
-<!DOCTYPE html>
-<html>
-<head>
-  <link href="index.css" rel="stylesheet">
-
-  <script type="text/javascript" src="bundle.js"></script>
-</head>
-<body>
-</body>
-</html>
-</script>
+<pre><code class="html">
+&lt;!DOCTYPE html>
+&lt;html>
+&lt;head>
+  &lt;link href="index.css" rel="stylesheet">
+  &lt;script type="text/javascript" src="bundle.js"></script>
+&lt;/head>
+&lt;body>
+&lt;/body>
+&lt;/html>
+</code></pre>
 
 <p>
 The HTML file also imports a style sheet, otherwise when the page is viewed in
@@ -168,7 +156,7 @@ the browser there will be a blank page only. This simple css files sets the
 background color, the font size and the initial minimal size of the panels:
 </p>
 
-<pre>
+<pre><code class="css">
 .content {
   border: 1px solid black;
   min-width: 200px;
@@ -176,7 +164,7 @@ background color, the font size and the initial minimal size of the panels:
   font-size: large;
   background: #F3F3F3;
 }
-</pre>
+</code></pre>
 
                     </section>
                 </article>
@@ -199,10 +187,6 @@ background color, the font size and the initial minimal size of the panels:
                 <h3>footer</h3>
             </footer>
         </div> -->
-
-        <script type="text/javascript">
-          SyntaxHighlighter.all()
-        </script>
 
         <script src="js/main.js"></script>
     </body>
