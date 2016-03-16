@@ -1,0 +1,694 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>PhosphorJS: Examples</title>
+<meta name="description" content="PhosphorJS">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="favicon.ico">
+<link href='https://fonts.googleapis.com/css?family=Lato:400italic,300,300italic' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Nunito:300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="css/normalize.min.css">
+<link rel="stylesheet" href="css/main.css">
+
+<link rel="stylesheet" href="highlight/styles/paraiso-light.css">
+<script src="highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+<!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+            <script>window.html5 || document.write('<script src="js/vendor/html5shiv.js"><\/script>')</script>
+        <![endif]-->
+</head>
+<body>
+
+<div class="header-container">
+  <header class="wrapper clearfix">
+    <a href="index.html">
+      <div class="logo"></div>
+      <h1 class="title">PhosphorJS</h1>
+    </a>
+    <nav>
+      <ul>
+        <li><a href="https://github.com/phosphorjs/">GitHub</a></li>
+        <li><a href="quickstart.html">Quickstart</a></li> 
+        <li><a href="tutorials.html">Tutorials</a></li>
+        <li><a href="examples.html">Examples</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+  </header>
+</div>
+
+<div class="main-container">
+  <div class="main wrapper clearfix">
+    <article>
+      <heading>
+      <h1>Desktop-like UI with PhosphorJS</h1>
+      </heading>
+      <p>This tutorial shows how to create UIs with PhosphorJS.
+      You will create a dynamic set of widgets that support
+      drag-and drop to change the layout. The widgets can be
+      moved to a new location, resized and or attached on a new
+      tab to an existing panel.  Additionally, a menu bar with
+      some standard options is included.</p>
+
+      <p>These desktop-like web applications are impossible to
+      achieve using CSS alone. Currently there's nothing like
+      PhosphorJS in the JavaScript ecosystem.</p>
+
+
+      <section>
+        <h2>PhosphorJS Menus</h2>
+        <p>We will start off with a menu bar. The
+        <tt>phosphor-menus</tt> module provides widgets for easy
+        creation of menu bars and contextual menus. Create a
+        <tt>index.ts</tt> file with the following code:</p>
+
+        <pre><code class="typescript">
+        'use strict';
+
+        import {
+          Menu, MenuBar, MenuItem
+        } from 'phosphor-menus';
+
+        /*
+         * Menu Bar
+         */
+
+        // A handler which logs the item text to the log span.
+        function logHandler(item: MenuItem): void {
+          var node = document.getElementById('log-span');
+          node.textContent = item.text.replace(/&/g, '');
+        }
+
+        function createMenuBar(): MenuBar {
+          let fileMenu = new Menu([
+            new MenuItem({
+              text: 'New File',
+              shortcut: 'Ctrl+N',
+              handler: logHandler
+            }),
+            new MenuItem({
+              text: 'New Tab',
+              shortcut: 'Ctrl+T',
+              handler: logHandler
+            })
+          ]);
+
+          let editMenu = new Menu([
+            new MenuItem({
+              text: '&Undo',
+              icon: 'fa fa-undo',
+              shortcut: 'Ctrl+Z',
+              handler: logHandler
+            }),
+            new MenuItem({
+              text: '&Repeat',
+              icon: 'fa fa-repeat',
+              shortcut: 'Ctrl+Y',
+              disabled: true
+            }),
+            new MenuItem({
+              type: MenuItem.Separator
+            }),
+            new MenuItem({
+              text: '&Copy',
+              icon: 'fa fa-copy',
+              shortcut: 'Ctrl+C',
+              handler: logHandler
+            }),
+            new MenuItem({
+              text: 'Cu&t',
+              icon: 'fa fa-cut',
+              shortcut: 'Ctrl+X',
+              handler: logHandler
+            }),
+            new MenuItem({
+              text: '&Paste',
+              icon: 'fa fa-paste',
+              shortcut: 'Ctrl+V',
+              handler: logHandler
+            })
+          ]);
+
+          return new MenuBar([
+            new MenuItem({
+              text: 'File',
+              submenu: fileMenu
+            }),
+            new MenuItem({
+              text: 'Edit',
+              submenu: editMenu
+            })
+          ]);
+        }
+        </code></pre>
+      </section>
+
+      <section>
+        <h2>PhosphorJS Widgets</h2>
+
+        <p>Now we proceed to define the widgets to add. Using the
+        <tt>Widget</tt> constructor and the corresponding
+        <tt>node</tt> is a straightforward way of adding new
+        content. It is also possible to subclass
+        <tt>Widgets</tt>.</p>
+
+        First, the required modules have to be imported, so at the beginning of
+        the following code must be placed:
+
+        <pre><code class="typescript">
+        import {
+          Message
+        } from 'phosphor-messaging';
+
+        import {
+          ResizeMessage, Widget
+        } from 'phosphor-widget';
+
+        import {
+          Menu, MenuBar, MenuItem
+        } from 'phosphor-menus';
+
+        // ...
+        </code></pre>
+
+        <p>Then the widget-creation functions are added with the following
+        code:</p>
+
+
+        <pre><code class="typescript">
+        /**
+         * Create a placeholder content widget.
+         */
+        function createContent(title: string): Widget {
+          var widget = new Widget();
+          widget.addClass('content');
+          widget.addClass(title.toLowerCase());
+
+          widget.title.text = title;
+          widget.title.closable = true;
+
+          return widget;
+        }
+
+        /**
+         * A widget which hosts a CodeMirror editor.
+         */
+        class CodeMirrorWidget extends Widget {
+
+          constructor(config?: CodeMirror.EditorConfiguration) {
+            super();
+            this.addClass('CodeMirrorWidget');
+            this._editor = CodeMirror(this.node, config);
+          }
+
+          get editor(): CodeMirror.Editor {
+            return this._editor;
+          }
+
+          loadTarget(target: string): void {
+            var doc = this._editor.getDoc();
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', target);
+            xhr.onreadystatechange = () => doc.setValue(xhr.responseText);
+            xhr.send();
+          }
+
+          protected onAfterAttach(msg: Message): void {
+            this._editor.refresh();
+          }
+
+          protected onResize(msg: ResizeMessage): void {
+            if (msg.width < 0 || msg.height < 0) {
+              this._editor.refresh();
+            } else {
+              this._editor.setSize(msg.width, msg.height);
+            }
+          }
+
+          private _editor: CodeMirror.Editor;
+        }
+        </code></pre>
+
+
+        <p>Now we can attach all the elements to the DOM. There are several
+        methods for this. In this case we are using a Dock Panel, so we import
+        the corresponding module on top of the script:</p> 
+
+        <pre><code class="typescript">
+        import {
+          DockPanel
+        } from 'phosphor-dockpanel';
+
+        import {
+          Message
+        } from 'phosphor-messaging';
+
+        // ...
+        </code></pre>
+
+        <p>A dock panel provides a versatile paneling interface and managing
+        the layout is really easy:.</p>
+
+        <pre><code class="typescript">
+        /**
+         * The main application entry point.
+         */
+        function main(): void {
+          var b1 = createContent('Blue');
+          b1.node.innerHTML = '&lt;span id="log-span"> &lt;/span>';
+          var g1 = createContent('Green');
+
+          var panel = new DockPanel();
+          panel.id = 'main';
+
+          var cmSource = new CodeMirrorWidget({
+            mode: 'text/typescript',
+            lineNumbers: true,
+            tabSize: 2,
+          });
+          cmSource.loadTarget('./index.ts');
+          cmSource.title.text = 'Source';
+
+          var cmCss = new CodeMirrorWidget({
+            mode: 'text/css',
+            lineNumbers: true,
+            tabSize: 2,
+          });
+          cmCss.loadTarget('./index.css');
+          cmCss.title.text = 'CSS';
+
+          panel.insertLeft(cmSource);
+          panel.insertRight(cmCss, cmSource);
+
+          panel.insertBottom(b1);
+          panel.insertTabBefore(g1, b1);
+
+          var menuBar = createMenuBar();
+
+          menuBar.attach(document.body);
+          panel.attach(document.body);
+
+          window.onresize = () => { panel.update() };
+        }
+
+        window.onload = main;
+        </code></pre>
+
+        <p>The user has complete freedom when it comes to styling every
+        component. The corresponding CSS file can be either imported directly
+        into the typescript file with <tt>import './index.css;'</tt> or into the
+        HTML with the usual <tt>&lt;script></tt> tag. This is the content of
+        <tt>index.css</tt>:</p>
+
+        <pre><code class="css">
+
+        body {
+          margin: 0;
+          padding: 0;
+          background: #F5F6F7;
+        }
+        
+        
+        #main {
+          position: absolute;
+          top: 30px;
+          left: 10px;
+          right: 10px;
+          bottom: 10px;
+        }
+        
+        
+        .CodeMirrorWidget {
+          border: 1px solid #C0C0C0;
+          min-width: 200px;
+          min-height: 200px;
+        }
+        
+        
+        .content {
+          border: 1px solid black;
+          min-width: 50px;
+          min-height: 50px;
+        }
+        
+        
+        .red {
+          background: #E74C3C;
+        }
+        
+        
+        .yellow {
+          background: #F1C40F;
+        }
+        
+        
+        .green {
+          background: #27AE60;
+        }
+        
+        
+        .blue {
+          background: #3498DB;
+        }
+        
+        
+        .p-DockTabPanel {
+          padding-right: 2px;
+          padding-bottom: 2px;
+        }
+        
+        
+        .p-DockTabPanel > .p-StackedPanel {
+          padding: 10px;
+          background: white;
+          border: 1px solid #C0C0C0;
+          border-top: none;
+          box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        
+        .p-DockPanel-overlay {
+          background: rgba(255, 255, 255, 0.6);
+          border: 1px dashed black;
+        }
+        
+        
+        .p-DockPanel-overlay.p-mod-root-top,
+        .p-DockPanel-overlay.p-mod-root-left,
+        .p-DockPanel-overlay.p-mod-root-right,
+        .p-DockPanel-overlay.p-mod-root-bottom,
+        .p-DockPanel-overlay.p-mod-root-center {
+          border-width: 2px;
+        }
+        
+        
+        .p-TabBar {
+          min-height: 24px;
+          max-height: 24px;
+        }
+        
+        
+        .p-TabBar-header {
+          display: none;
+        }
+        
+        
+        .p-TabBar-footer {
+          flex: 0 0 1px;
+          background: #C0C0C0;
+        }
+        
+        
+        .p-TabBar-content {
+          min-width: 0;
+          align-items: flex-end;
+        }
+        
+        
+        .p-TabBar-tab {
+          flex: 0 1 125px;
+          min-height: 20px;
+          max-height: 20px;
+          min-width: 35px;
+          margin-left: -1px;
+          border: 1px solid #C0C0C0;
+          border-bottom: none;
+          padding: 0px 10px;
+          background: #E5E5E5;
+          font: 12px Helvetica, Arial, sans-serif;
+        }
+        
+        
+        .p-TabBar-tab:first-child {
+          margin-left: 0;
+        }
+        
+        
+        .p-TabBar-tab.p-mod-current {
+          min-height: 23px;
+          max-height: 23px;
+          background: white;
+          transform: translateY(1px);
+        }
+        
+        
+        .p-TabBar-tab:hover:not(.p-mod-current) {
+          background: #F0F0F0;
+        }
+        
+        
+        .p-TabBar-tabIcon,
+        .p-TabBar-tabText,
+        .p-TabBar-tabCloseIcon {
+          line-height: 20px;
+        }
+        
+        
+        .p-TabBar-tab.p-mod-closable > .p-TabBar-tabCloseIcon {
+          margin-left: 4px;
+        }
+        
+        
+        .p-TabBar-tab.p-mod-closable > .p-TabBar-tabCloseIcon:before {
+          content: '\f00d';
+          font-family: FontAwesome;
+        }
+        
+        
+        .p-TabBar-tab.p-mod-drag-image {
+          min-height: 23px;
+          max-height: 23px;
+          min-width: 125px;
+          border: none;
+          box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+          transform: translateX(-40%) translateY(-58%);
+        }
+        
+        
+        /*Pasted stuff
+        **********************************
+        */
+        
+        /*.p-TabBar {
+          min-height: 24px;
+          max-height: 24px;
+        }
+        
+        
+        .p-TabBar-header {
+          display: none;
+        }
+        
+        
+        .p-TabBar-footer {
+          flex: 0 0 1px;
+          background: #C0C0C0;
+        }
+        
+        
+        .p-TabBar-content {
+          min-width: 0;
+          align-items: flex-end;
+        }
+        
+        
+        .p-TabBar-tab {
+          flex: 0 1 125px;
+          min-height: 20px;
+          max-height: 20px;
+          min-width: 35px;
+          margin-left: -1px;
+          border: 1px solid #C0C0C0;
+          border-bottom: none;
+          padding: 0px 10px;
+          background: #E5E5E5;
+          font: 12px Helvetica, Arial, sans-serif;
+        }
+        
+        
+        .p-TabBar-tab:first-child {
+          margin-left: 0;
+        }
+        
+        
+        .p-TabBar-tab.p-mod-current {
+          min-height: 23px;
+          max-height: 23px;
+          background: white;
+          transform: translateY(1px);
+        }
+        
+        
+        .p-TabBar-tab:hover:not(.p-mod-current) {
+          background: #F0F0F0;
+        }
+        
+        
+        .p-TabBar-tabIcon,
+        .p-TabBar-tabText,
+        .p-TabBar-tabCloseIcon {
+          line-height: 20px;
+        }
+        
+        
+        .p-TabPanel > .p-StackedPanel {
+          background: white;
+          border: 1px solid #C0C0C0;
+          border-top: none;
+        }*/
+        
+        
+        .p-MenuBar {
+          padding-left: 5px;
+          background: #FEFEFE;
+          color: rgba(0, 0, 0, 0.87);
+          border-bottom: 1px solid #DDDDDD;
+          font: 13px Helvetica, Arial, sans-serif;
+        }
+        
+        
+        .p-MenuBar-menu {
+          transform: translateY(-1px);
+        }
+        
+        
+        .p-MenuBar-item {
+          padding: 4px 8px;
+          border-left: 1px solid transparent;
+          border-right: 1px solid transparent;
+        }
+        
+        
+        .p-MenuBar-item.p-mod-active {
+          background: #E5E5E5;
+        }
+        
+        
+        .p-MenuBar-item.p-mod-disabled {
+          color: rgba(0, 0, 0, 0.26);
+        }
+        
+        
+        .p-MenuBar-item.p-mod-separator-type {
+          margin: 2px;
+          padding: 0;
+          border: none;
+          border-left: 1px solid #DDDDDD;
+        }
+        
+        
+        .p-MenuBar.p-mod-active .p-MenuBar-item.p-mod-active {
+          z-index: 1000000;
+          background: white;
+          border-left: 1px solid #C0C0C0;
+          border-right: 1px solid #C0C0C0;
+          box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        
+        .p-Menu {
+          z-index: 10000;
+          padding: 3px 0px;
+          background: white;
+          color: rgba(0, 0, 0, 0.87);
+          border: 1px solid #C0C0C0;
+          font: 12px Helvetica, Arial, sans-serif;
+          box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        
+        .p-Menu-item.p-mod-active {
+          background: #E5E5E5;
+        }
+        
+        
+        .p-Menu-item.p-mod-disabled {
+          color: rgba(0, 0, 0, 0.26);
+        }
+        
+        
+        .p-Menu-itemIcon {
+          width: 21px;
+          padding: 4px 2px;
+        }
+        
+        
+        .p-Menu-itemText {
+          padding: 4px 35px 4px 2px;
+        }
+        
+        
+        .p-Menu-itemShortcut {
+          padding: 4px 0px;
+        }
+        
+        
+        .p-Menu-itemSubmenuIcon {
+          width: 16px;
+          padding: 4px 0px;
+        }
+        
+        
+        .p-Menu-item.p-type-separator > span {
+          padding: 0;
+          height: 9px;
+        }
+        
+        
+        .p-Menu-item.p-type-separator > span::after {
+          content: '';
+          display: block;
+          position: relative;
+          top: 4px;
+          border-top: 1px solid #DDDDDD;
+        }
+        
+        
+        .p-Menu-itemIcon::before,
+        .p-Menu-itemSubmenuIcon::before {
+          font-family: FontAwesome;
+        }
+        
+        
+        .p-Menu-item.p-type-check.p-mod-checked > .p-Menu-itemIcon::before {
+          content: '\f00c';
+        }
+        
+        
+        .p-Menu-item.p-type-submenu > .p-Menu-itemSubmenuIcon::before {
+          content: '\f0da';
+        }
+        </code></pre>
+
+      </section>
+
+    </article>
+
+    <aside>
+      <div class="logo"></div>
+      <h2>PhosphorJS</h2>
+      <p>a collection of libraries <br>
+      designed  to make it easy<br>
+      to build high-performance,<br>
+      pluggable, desktop-style <br>
+      web applications</p>
+    </aside>
+
+  </div> <!-- #main -->
+</div> <!-- #main-container -->
+
+<!-- <div class="footer-container">
+            <footer class="wrapper">
+                <h3>footer</h3>
+            </footer>
+        </div> -->
+
+<script src="js/main.js"></script>
+</body>
+</html>
