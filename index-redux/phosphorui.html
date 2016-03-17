@@ -59,7 +59,7 @@
       ecosystem.</p>
 
       <p>The resulting interface of this tutorial will present two Code Mirror
-      instances side to side showing the html and typescript source code. An
+      instances side by side showing the html and CSS source code. An
       additional widget at the bottom will show all menu-related events.</p>
 
       <p>It is important to remark that PhosphorJS libraries are not
@@ -67,7 +67,7 @@
       be used independently to fulfill application-specific needs. In this case
       we will use typescript, the code has then to be bundled for the browser
       with a tool that understands how to <tt>require</tt> files with
-      <tt>.js</tt> and <tt>.cc</tt> extensions.
+      <tt>.js</tt> and <tt>.css</tt> extensions.
 
       <section>
         <h2>PhosphorJS Menus</h2>
@@ -167,16 +167,21 @@ function createMenuBar(): MenuBar {
 
         <p>The core Widget class provides a way to assemble widget hierarchies
         using the tried-and-true patterns found in established desktop widget
-        systems but which render using regular DOM APIs</p>
-        
-        <p>Now we proceed to define the widgets to add. Using the
-        <tt>Widget</tt> constructor and the corresponding <tt>node</tt> is a
-        straightforward way of adding new content. It is also possible to
-        subclass <tt>Widgets</tt>.</p>
+        systems but which render using regular DOM API. Standard messages such
+        as show/hide attach/detach, resize, close and so on that are standard
+        in desktop GUI toolkits are included since these are critical for a
+        desktop-like experience. </p>
+
+        <p>Any DOM content can be added to a widget. The <tt>node</tt>
+        attribute of a <tt>Widget</tt> is just a standard DOM node and in this
+        case will be used to attach a <tt>&lt;span></tt> container to log the menu
+        events. As mentioned before the web interface will also show two
+        CodeMirror editors, for this we subclass <tt>Widget</tt> to set up the
+        editor configuration.</p>
 
         <p>
         First, the required modules have to be imported, so at the beginning of
-        the following code must be placed:</p>
+        <tt>index.ts</tt> the following code must be placed:</p>
 
         <pre><code class="typescript">
 import {
@@ -187,15 +192,10 @@ import {
   ResizeMessage, Widget
 } from 'phosphor-widget';
 
-import {
-  Menu, MenuBar, MenuItem
-} from 'phosphor-menus';
-
 // ...
         </code></pre>
 
-        <p>Then the widget-creation functions are added with the following
-        code:</p>
+        <p>Then add the widget-creation code at the bottom:</p>
 
 
         <pre><code class="typescript">
@@ -251,26 +251,34 @@ class CodeMirrorWidget extends Widget {
   private _editor: CodeMirror.Editor;
 }
         </code></pre>
+      </section>
 
+      <section>
+        <h2>Phosphor DockPanel</h2>
 
-        <p>Now we can attach all the elements to the DOM. There are several
-        methods for this. In this case we are using a Dock Panel, so we import
-        the corresponding module on top of the script:</p> 
+        <p>To attach all the elements to the DOM we use the
+        <tt>phosphor-dockpanel</tt> module:</p>
 
         <pre><code class="typescript">
 import {
   DockPanel
 } from 'phosphor-dockpanel';
 
-import {
-  Message
-} from 'phosphor-messaging';
-
 // ...
         </code></pre>
 
-        <p>A dock panel provides a versatile paneling interface and managing
-        the layout is really easy:.</p>
+        <p>A dock panel provides a versatile docking area for content widgets.
+        It is not the only way to organize widgets, BoxPanel, GridPanel,
+        SplitPanel and StackedPanel provide plenty of options to customize the
+        UI.</p>
+
+        <p>A dock panel provides several methods to position new widgets
+        (<tt>insertRight()</tt>, <tt>insertLeft()</tt>, <tt>insertTop()</tt>
+        and <tt>insertBottom()</tt>) , the widget positions can be relative to
+        other widgets or to the edges of the docking area.</p> 
+
+        <p>The following code creates a Dock Panel also loads the  Menu Bar and
+        the rest of the elements that will show up in the browser.</p> 
 
         <pre><code class="typescript">
 /**
@@ -316,6 +324,18 @@ function main(): void {
 
 window.onload = main;
         </code></pre>
+      </section>
+
+      <section>
+        <h2>Styling with CSS</h2>
+
+        <p>Another feature of Phosphor is its absolute layout engine. This
+        makes it possible to achieve layouts and interactions which are not
+        possible with CSS alone.  It's important to note that using Phosphor
+        widgets does *not* mean you have to use the absolute layout engine.
+        That's just another option you can use if it solves your problem. You
+        can assemble a Phosphor widget hierarchy and layout the widgets using
+        regular CSS (like flexbox, floats, etc) just as easily.</p>
 
         <p>The user has complete freedom when it comes to styling every
         component. The corresponding CSS file can be either imported directly
@@ -331,7 +351,6 @@ body {
   background: #F5F6F7;
 }
 
-
 #main {
   position: absolute;
   top: 30px;
@@ -340,13 +359,11 @@ body {
   bottom: 10px;
 }
 
-
 .CodeMirrorWidget {
   border: 1px solid #C0C0C0;
   min-width: 200px;
   min-height: 200px;
 }
-
 
 .content {
   border: 1px solid black;
@@ -354,32 +371,26 @@ body {
   min-height: 50px;
 }
 
-
 .red {
   background: #E74C3C;
 }
-
 
 .yellow {
   background: #F1C40F;
 }
 
-
 .green {
   background: #27AE60;
 }
-
 
 .blue {
   background: #3498DB;
 }
 
-
 .p-DockTabPanel {
   padding-right: 2px;
   padding-bottom: 2px;
 }
-
 
 .p-DockTabPanel > .p-StackedPanel {
   padding: 10px;
@@ -389,12 +400,10 @@ body {
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-
 .p-DockPanel-overlay {
   background: rgba(255, 255, 255, 0.6);
   border: 1px dashed black;
 }
-
 
 .p-DockPanel-overlay.p-mod-root-top,
 .p-DockPanel-overlay.p-mod-root-left,
@@ -404,29 +413,24 @@ body {
   border-width: 2px;
 }
 
-
 .p-TabBar {
   min-height: 24px;
   max-height: 24px;
 }
 
-
 .p-TabBar-header {
   display: none;
 }
-
 
 .p-TabBar-footer {
   flex: 0 0 1px;
   background: #C0C0C0;
 }
 
-
 .p-TabBar-content {
   min-width: 0;
   align-items: flex-end;
 }
-
 
 .p-TabBar-tab {
   flex: 0 1 125px;
@@ -441,11 +445,9 @@ body {
   font: 12px Helvetica, Arial, sans-serif;
 }
 
-
 .p-TabBar-tab:first-child {
   margin-left: 0;
 }
-
 
 .p-TabBar-tab.p-mod-current {
   min-height: 23px;
@@ -454,11 +456,9 @@ body {
   transform: translateY(1px);
 }
 
-
 .p-TabBar-tab:hover:not(.p-mod-current) {
   background: #F0F0F0;
 }
-
 
 .p-TabBar-tabIcon,
 .p-TabBar-tabText,
@@ -466,17 +466,14 @@ body {
   line-height: 20px;
 }
 
-
 .p-TabBar-tab.p-mod-closable > .p-TabBar-tabCloseIcon {
   margin-left: 4px;
 }
-
 
 .p-TabBar-tab.p-mod-closable > .p-TabBar-tabCloseIcon:before {
   content: '\f00d';
   font-family: FontAwesome;
 }
-
 
 .p-TabBar-tab.p-mod-drag-image {
   min-height: 23px;
@@ -487,80 +484,6 @@ body {
   transform: translateX(-40%) translateY(-58%);
 }
 
-
-/*Pasted stuff
-**********************************
-*/
-
-/*.p-TabBar {
-  min-height: 24px;
-  max-height: 24px;
-}
-
-
-.p-TabBar-header {
-  display: none;
-}
-
-
-.p-TabBar-footer {
-  flex: 0 0 1px;
-  background: #C0C0C0;
-}
-
-
-.p-TabBar-content {
-  min-width: 0;
-  align-items: flex-end;
-}
-
-
-.p-TabBar-tab {
-  flex: 0 1 125px;
-  min-height: 20px;
-  max-height: 20px;
-  min-width: 35px;
-  margin-left: -1px;
-  border: 1px solid #C0C0C0;
-  border-bottom: none;
-  padding: 0px 10px;
-  background: #E5E5E5;
-  font: 12px Helvetica, Arial, sans-serif;
-}
-
-
-.p-TabBar-tab:first-child {
-  margin-left: 0;
-}
-
-
-.p-TabBar-tab.p-mod-current {
-  min-height: 23px;
-  max-height: 23px;
-  background: white;
-  transform: translateY(1px);
-}
-
-
-.p-TabBar-tab:hover:not(.p-mod-current) {
-  background: #F0F0F0;
-}
-
-
-.p-TabBar-tabIcon,
-.p-TabBar-tabText,
-.p-TabBar-tabCloseIcon {
-  line-height: 20px;
-}
-
-
-.p-TabPanel > .p-StackedPanel {
-  background: white;
-  border: 1px solid #C0C0C0;
-  border-top: none;
-}*/
-
-
 .p-MenuBar {
   padding-left: 5px;
   background: #FEFEFE;
@@ -569,11 +492,9 @@ body {
   font: 13px Helvetica, Arial, sans-serif;
 }
 
-
 .p-MenuBar-menu {
   transform: translateY(-1px);
 }
-
 
 .p-MenuBar-item {
   padding: 4px 8px;
@@ -581,16 +502,13 @@ body {
   border-right: 1px solid transparent;
 }
 
-
 .p-MenuBar-item.p-mod-active {
   background: #E5E5E5;
 }
 
-
 .p-MenuBar-item.p-mod-disabled {
   color: rgba(0, 0, 0, 0.26);
 }
-
 
 .p-MenuBar-item.p-mod-separator-type {
   margin: 2px;
@@ -599,7 +517,6 @@ body {
   border-left: 1px solid #DDDDDD;
 }
 
-
 .p-MenuBar.p-mod-active .p-MenuBar-item.p-mod-active {
   z-index: 1000000;
   background: white;
@@ -607,7 +524,6 @@ body {
   border-right: 1px solid #C0C0C0;
   box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
 }
-
 
 .p-Menu {
   z-index: 10000;
@@ -619,44 +535,36 @@ body {
   box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.2);
 }
 
-
 .p-Menu-item.p-mod-active {
   background: #E5E5E5;
 }
 
-
 .p-Menu-item.p-mod-disabled {
   color: rgba(0, 0, 0, 0.26);
 }
-
 
 .p-Menu-itemIcon {
   width: 21px;
   padding: 4px 2px;
 }
 
-
 .p-Menu-itemText {
   padding: 4px 35px 4px 2px;
 }
 
-
 .p-Menu-itemShortcut {
   padding: 4px 0px;
 }
-
 
 .p-Menu-itemSubmenuIcon {
   width: 16px;
   padding: 4px 0px;
 }
 
-
 .p-Menu-item.p-type-separator > span {
   padding: 0;
   height: 9px;
 }
-
 
 .p-Menu-item.p-type-separator > span::after {
   content: '';
@@ -666,17 +574,14 @@ body {
   border-top: 1px solid #DDDDDD;
 }
 
-
 .p-Menu-itemIcon::before,
 .p-Menu-itemSubmenuIcon::before {
   font-family: FontAwesome;
 }
 
-
 .p-Menu-item.p-type-check.p-mod-checked > .p-Menu-itemIcon::before {
   content: '\f00c';
 }
-
 
 .p-Menu-item.p-type-submenu > .p-Menu-itemSubmenuIcon::before {
   content: '\f0da';
