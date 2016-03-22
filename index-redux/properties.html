@@ -1,0 +1,537 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>PhosphorJS: Properties</title>
+<meta name="description" content="PhosphorJS">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="favicon.ico">
+<link href='https://fonts.googleapis.com/css?family=Lato:400italic,300,300italic' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Nunito:300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="css/normalize.min.css">
+<link rel="stylesheet" href="css/main.css">
+
+<link rel="stylesheet" href="highlight/styles/paraiso-light.css">
+<script src="highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+<!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+            <script>window.html5 || document.write('<script src="js/vendor/html5shiv.js"><\/script>')</script>
+        <![endif]-->
+</head>
+<body>
+
+<div class="header-container">
+  <header class="wrapper clearfix">
+    <a href="index.html">
+      <div class="logo"></div>
+      <h1 class="title">PhosphorJS</h1>
+    </a>
+    <nav>
+      <ul>
+        <li><a href="https://github.com/phosphorjs/">GitHub</a></li>
+        <li><a href="quickstart.html">Quickstart</a></li> 
+        <li><a href="tutorials.html">Tutorials</a></li>
+        <li><a href="examples.html">Examples</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+  </header>
+</div>
+
+<div class="main-container">
+  <div class="main wrapper clearfix">
+    <article>
+      <heading>
+      <h1>Properties</h1>
+      </heading>
+      <section>
+        <p>A module for attached property descriptors.</p>
+
+        <p>Phosphor properties encapsulate several behaviors:</p>
+
+        <ul>
+          <li><p><strong>Creation</strong> - A property value can default to a static scalar value or be lazily created by invoking a value factory function.</p>
+
+          </li>
+          <li><p><strong>Coercion</strong> - A property can coerce a user-provided value into a value which is guaranteed to be correct based on current state.</p>
+
+          </li>
+          <li><p><strong>Notification</strong> - User code can be notified when a property value changes.</p>
+
+          </li>
+          <li><p><strong>Attachment</strong> - A property can be defined for <em>any</em> object, not just for instances of the class which defines the property. This allows for extra state and behavior to be &quot;attached&quot; to arbitrary objects by external consumers of those objects.</p>
+
+          </li>
+        </ul>
+        <p>These behavioral patterns are extremely useful for managing complexity in large applications. However, they are tedious and repetitive to implement manually. Phosphor properties reduce developer burden by bundling these behaviors into an efficient and type-safe form.</p>
+      </section>
+
+      <section>
+        <h2>Supported Runtimes</h2>
+
+        <p>The runtime versions which are currently <em>known to work</em> are listed below. Earlier versions may also work, but come with no guarantees.</p>
+
+        <ul>
+          <li>Node 0.12.7+</li>
+          <li>IE 11+</li>
+          <li>Firefox 32+</li>
+          <li>Chrome 38+</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Bundle for the Browser</h2>
+
+        <p>Any bundler that understands how to <tt>require()</tt> files with .js and .css extensions can be used with this package.</p>
+      </section>
+
+      <section>
+        <h2>Usage Examples</h2>
+
+        <p><strong>Note:</strong> This module is fully compatible with Node/Babel/ES6/ES5. Simply omit the type declarations when using a language other than TypeScript.</p>
+
+        <p>Class authors should strive to maintain consistency in how their classes expose properties to consumers. The PhosphorJS project has adopted a set of conventions which cover property naming, behavior, and exposure. It is recommended for third party libraries to adopt these same conventions in order to ensure API consistency and maximal compatibility with libraries and meta tools which rely on these conventions.</p>
+
+        <p>When defining a property for use by instances of the <strong>same</strong> class:</p>
+
+        <ul>
+          <li><p>Define the property as a static member of the class.</p>
+
+          </li>
+          <li><p>Ensure the class type is used as the property owner type.</p>
+
+          </li>
+          <li><p>Append the suffix <code>&#39;Property&#39;</code> to the static member name.</p>
+
+          </li>
+          <li><p>Give the property a <tt>name</tt> which is the same as the static member name, minus the <code>&#39;Property&#39;</code> suffix.</p>
+
+          </li>
+          <li><p>Define a public getter/setter which delegates access to the static property. The getter/setter should contain no logic outside of delegation to the static property.</p>
+
+          </li>
+          <li><p>The name of the getter/setter should be the same as the <tt>name</tt> given to the property.</p>
+
+          </li>
+          <li><p>Consumers should normally use the getter/setter to access the property, but meta tools and code generators are free to use the property API directly. This is why the getter/setter must be a pure delegate as described above.</p>
+
+          </li>
+        </ul>
+        <p>When defining a property for use by instances of a <strong>different</strong> class:</p>
+
+        <ul>
+          <li><p>Define the property as a static member of the class.</p>
+
+          </li>
+          <li><p>Ensure the instance type is used as the property owner type.</p>
+
+          </li>
+          <li><p>Append the suffix <code>&#39;Property&#39;</code> to the static member name.</p>
+
+          </li>
+          <li><p>Give the property a <tt>name</tt> which is the same as the static member name, minus the <code>&#39;Property&#39;</code> suffix.</p>
+
+          </li>
+          <li><p>Define static methods to get and set the value of the property for a particular instance of the owner type. These two methods should contain no logic outside of delegation to the static property.</p>
+
+          </li>
+          <li><p>Name the static methods by prepending <code>&#39;get&#39;</code> and <code>&#39;set&#39;</code> to the capitalized property <tt>name</tt>.</p>
+
+          </li>
+          <li><p>Consumers should normally use the static methods to access the property, but meta tools and code generators are free to use the property API directly. This is why the methods must be pure delegates as described above.</p>
+
+          </li>
+        </ul>
+        <p>A property declared for instances of a different class is referred to as an <em>attached property</em>. The behavior and semantics of the property are defined by one class, but the property value belongs to a foreign instance. This pattern is useful when creating container objects which must associate container data with child objects in a way which doesn&#39;t require polluting the child class with extraneous data members.</p>
+
+        <p><strong>Basic Value:</strong></p>
+
+        <pre><code class="typescript">
+import {
+  Property
+} from &#39;phosphor-properties&#39;;
+
+
+class MyObject {
+
+  static valueProperty = new Property&lt;MyObject, number&gt;({
+    name: &#39;value&#39;,
+    value: 42,
+  });
+
+  get value(): number {
+    return MyObject.valueProperty.get(this);
+  }
+
+  set value(value: number) {
+    MyObject.valueProperty.set(this, value);
+  }
+}
+
+
+let obj = new MyObject();
+
+obj.value;       // 42
+obj.value = 17;  //
+obj.value;       // 17
+        </code></pre>
+
+        <p><strong>Create Callback:</strong></p>
+
+        <pre><code class="typescript">import {
+  Property
+} from &#39;phosphor-properties&#39;;
+
+
+class MyObject {
+
+  static oneProperty = new Property&lt;MyObject, number[]&gt;({
+    name: &#39;one&#39;,
+    value: [1, 2, 3],
+  });
+
+  static twoProperty = new Property&lt;MyObject, number[]&gt;({
+    name: &#39;two&#39;,
+    create: () =&gt; [1, 2, 3],
+  });
+
+  get one(): number[] {
+    return MyObject.oneProperty.get(this);
+  }
+
+  get two(): number[] {
+    return MyObject.twoProperty.get(this);
+  }
+}
+
+
+let obj1 = new MyObject();
+let obj2 = new MyObject();
+
+obj1.one;               // [1, 2, 3]
+obj1.two;               // [1, 2, 3]
+
+obj2.one;               // [1, 2, 3]
+obj2.two;               // [1, 2, 3]
+
+obj1.one === obj2.one;  // true
+obj1.two === obj2.two;  // false
+        </code></pre>
+
+        <p><strong>Changed Callback:</strong></p>
+
+        <pre><code class="typescript">
+import {
+  Property
+} from &#39;phosphor-properties&#39;;
+
+
+class MyObject {
+
+  static valueProperty = new Property&lt;MyObject, number&gt;({
+    name: &#39;value&#39;,
+    value: 42,
+    changed: (owner, old, value) =&gt; { owner._onValueChanged(old, value); },
+  });
+
+  get value(): number {
+    return MyObject.valueProperty.get(this);
+  }
+
+  set value(value: number) {
+    MyObject.valueProperty.set(this, value);
+  }
+
+  private _onValueChanged(old, value): void {
+    console.log(`value changed: ${old}, ${value}`);
+  }
+}
+
+
+let obj = new MyObject();
+
+obj.value;       // 42
+obj.value = 17;  // logs: value changed: 42, 17
+obj.value;       // 17
+        </code></pre>
+
+        <p><strong>Coerce Callback:</strong></p>
+
+        <pre><code class="typescript">
+import {
+  Property
+} from &#39;phosphor-properties&#39;;
+
+
+class MyObject {
+
+  static checkableProperty = new Property&lt;MyObject, boolean&gt;({
+    name: &#39;checkable&#39;,
+    value: true,
+    changed: owner =&gt; { MyObject.checkedProperty.coerce(owner); },
+  });
+
+  static checkedProperty = new Property&lt;MyObject, boolean&gt;({
+    name: &#39;checked&#39;,
+    value: false,
+    coerce: (owner, value) =&gt; owner.checkable ? value : false,
+  });
+
+  get checkable(): boolean {
+    return MyObject.checkableProperty.get(this);
+  }
+
+  set checkable(value: boolean) {
+    MyObject.checkableProperty.set(this, value);
+  }
+
+  get checked(): boolean {
+    return MyObject.checkedProperty.get(this);
+  }
+
+  set checked(value: boolean) {
+    MyObject.checkedProperty.set(this, value);
+  }
+}
+
+
+let obj = new MyObject();
+
+obj.checkable;          // true
+obj.checked;            // false
+
+obj.checked = true;     //
+obj.checked;            // true
+
+obj.checkable = false;  //
+obj.checked;            // false
+        </code></pre>
+
+        <p><strong>Notify Signal:</strong></p>
+
+        <pre><code class="typescript">
+import {
+  IChangedArgs, Property
+} from &#39;phosphor-properties&#39;;
+
+import {
+  ISignal, Signal
+} from &#39;phosphor-signaling&#39;;
+
+
+class MyObject {
+
+  static stateChangedSignal = new Signal&lt;MyObject, IChangedArgs&lt;any&gt;&gt;();
+
+  static valueProperty = new Property&lt;MyObject, number&gt;({
+    name: &#39;value&#39;,
+    value: 42,
+    notify: MyObject.stateChangedSignal,
+  });
+
+  static nameProperty = new Property&lt;MyObject, string&gt;({
+    name: &#39;name&#39;,
+    value: &#39;John&#39;,
+    notify: MyObject.stateChangedSignal,
+  });
+
+  get stateChanged(): ISignal&lt;MyObject, IChangedArgs&lt;any&gt;&gt; {
+    return MyObject.stateChangedSignal.bind(this);
+  }
+
+  get value(): number {
+    return MyObject.valueProperty.get(this);
+  }
+
+  set value(value: number) {
+    MyObject.valueProperty.set(this, value);
+  }
+
+  get name(): number {
+    return MyObject.nameProperty.get(this);
+  }
+
+  set name(value: number) {
+    MyObject.nameProperty.set(this, value);
+  }
+}
+
+
+function logger(sender: MyObject, args: IChangedArgs&lt;any&gt;): void {
+  console.log(`name: ${args.name}, old: ${args.oldValue}, new: ${args.newValue}`);
+}
+
+
+let obj = new MyObject();
+
+obj.stateChanged.connect(logger);
+
+obj.value = 17;     // logs: name: &#39;value&#39;, old: 42, new: 17
+obj.name = &#39;Jane&#39;;  // logs: name: &#39;name&#39;, old: &#39;John&#39;, new: &#39;Jane&#39;
+        </code></pre>
+
+        <p><strong>Compare Callback:</strong></p>
+
+        <pre><code class="typescript">
+import {
+  Property
+} from &#39;phosphor-properties&#39;;
+
+
+class MyObject {
+
+  static oneProperty = new Property&lt;MyObject, number&gt;({
+    name: &#39;one&#39;,
+    value: 42,
+    changed: () =&gt; { console.log(&#39;one changed&#39;); },
+  });
+
+  static twoProperty = new Property&lt;MyObject, number&gt;({
+    name: &#39;two&#39;,
+    value: 19,
+    compare: (a, b) =&gt; true,
+    changed: () =&gt; { console.log(&#39;two changed&#39;); },
+  });
+
+  static threeProperty = new Property&lt;MyObject, number&gt;({
+    name: &#39;three&#39;,
+    value: 100,
+    compare: (a, b) =&gt; false,
+    changed: () =&gt; { console.log(&#39;three changed&#39;); },
+  });
+
+  get one(): number {
+    return MyObject.oneProperty.get(this);
+  }
+
+  set one(value: number) {
+    MyObject.oneProperty.set(this, value);
+  }
+
+  get two(): number {
+    return MyObject.twoProperty.get(this);
+  }
+
+  set two(value: number) {
+    MyObject.twoProperty.set(this, value);
+  }
+
+  get three(): number {
+    return MyObject.threeProperty.get(this);
+  }
+
+  set three(value: number) {
+    MyObject.threeProperty.set(this, value);
+  }
+}
+
+
+let obj = new MyObject();
+
+obj.one;        // 42
+obj.two;        // 19
+obj.three;      // 100
+
+obj.one = 0;    // logs: one changed
+obj.one;        // 0
+obj.one = 1;    // logs: one changed
+obj.one;        // 1
+obj.one = 1;    // no log
+obj.one;        // 1
+
+obj.two = 0;    // no log
+obj.two;        // 0
+obj.two = 1;    // no log
+obj.two;        // 1
+obj.two = 1;    // no log
+obj.two;        // 1
+
+obj.three = 0;  // logs: three changed
+obj.three;      // 0
+obj.three = 1;  // logs: three changed
+obj.three;      // 1
+obj.three = 1;  // logs: three changed
+obj.three;      // 1
+        </code></pre>
+
+        <p><strong>Attached Property:</strong></p>
+
+        <pre><code class="typescript">
+import {
+  Property
+} from &#39;phosphor-properties&#39;;
+
+
+class MyWidget {
+  // ...
+}
+
+
+class MyContainer {
+
+  static stretchProperty = new Property&lt;MyWidget, number&gt;({
+    name: &#39;stretch&#39;,
+    value: 0,
+    coerce: (owner, value) =&gt; Math.max(0, value),
+  });
+
+  static getStretch(widget: MyWidget): number {
+    return MyContainer.stretchProperty.get(widget);
+  }
+
+  static setStretch(widget: MyWidget, value: number): void {
+    MyContainer.stretchProperty.set(widget, value);
+  }
+
+  addWidget(widget: MyWidget): void {
+    let stretch = MyContainer.getStretch(widget);
+    // ...
+  }
+}
+
+
+let widget = new MyWidget();
+MyContainer.setStretch(widget, 3);
+
+let container = new MyContainer();
+container.addWidget(widget);
+        </code></pre>
+      </section>
+
+      <section>
+        <h2>API</h2>
+
+        <p><a href="http://phosphorjs.github.io/phosphor-properties/api/">API Docs</a></p>
+
+      </section>
+    </article>
+
+    <aside>
+      <div class="logo"></div>
+      <h2>PhosphorJS</h2>
+      <p>a collection of libraries <br>
+      designed  to make it easy<br>
+      to build high-performance,<br>
+      pluggable, desktop-style <br>
+      web applications</p>
+    </aside>
+
+  </div> <!-- #main -->
+</div> <!-- #main-container -->
+
+<!-- <div class="footer-container">
+            <footer class="wrapper">
+                <h3>footer</h3>
+            </footer>
+        </div> -->
+
+<script src="js/main.js"></script>
+</body>
+</html>

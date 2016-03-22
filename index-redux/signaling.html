@@ -1,0 +1,283 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>PhosphorJS: Signaling</title>
+<meta name="description" content="PhosphorJS">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="favicon.ico">
+<link href='https://fonts.googleapis.com/css?family=Lato:400italic,300,300italic' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Nunito:300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="css/normalize.min.css">
+<link rel="stylesheet" href="css/main.css">
+
+<link rel="stylesheet" href="highlight/styles/paraiso-light.css">
+<script src="highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+<!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+            <script>window.html5 || document.write('<script src="js/vendor/html5shiv.js"><\/script>')</script>
+        <![endif]-->
+</head>
+<body>
+
+<div class="header-container">
+  <header class="wrapper clearfix">
+    <a href="index.html">
+      <div class="logo"></div>
+      <h1 class="title">PhosphorJS</h1>
+    </a>
+    <nav>
+      <ul>
+        <li><a href="https://github.com/phosphorjs/">GitHub</a></li>
+        <li><a href="quickstart.html">Quickstart</a></li> 
+        <li><a href="tutorials.html">Tutorials</a></li>
+        <li><a href="examples.html">Examples</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+  </header>
+</div>
+
+<div class="main-container">
+  <div class="main wrapper clearfix">
+    <article>
+      <heading>
+      <h1>Signaling</h1>
+      </heading>
+      <section>
+        <p>A module for type-safe inter-object communication.</p>
+      </section>
+
+      <section>
+        <h2>Supported Runtimes</h2>
+
+        <p>The runtime versions which are currently <em>known to work</em> are listed below. Earlier versions may also work, but come with no guarantees.</p>
+
+        <ul>
+          <li>Node 0.12.7+</li>
+          <li>IE 11+</li>
+          <li>Firefox 32+</li>
+          <li>Chrome 38+</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Bundle for the Browser</h2>
+
+        <p>Any bundler that understands how to <tt>require()</tt> files with .js and .css extensions can be used with this package.</p>
+      </section>
+
+      <section>
+        <h2>Usage Examples</h2>
+
+        <p><strong>Note:</strong> This module is fully compatible with Node/Babel/ES6/ES5. Simply omit the type declarations when using a language other than TypeScript.</p>
+
+        <p><strong>Recommended Design Patterns:</strong></p>
+
+        <p>Class authors should strive to maintain consistency in how their classes expose signals to consumers. The PhosphorJS project has adopted a set of conventions which cover signal naming and exposure. It is recommended for third party libraries to adopt these same conventions in order to ensure API consistency and maximal compatibility with libraries and meta tools which rely on these conventions.</p>
+
+        <p>When defining a signal for use by instances of the <strong>same</strong> class:</p>
+
+        <ul>
+          <li><p>Define the signal as a static member of the class.</p>
+
+          </li>
+          <li><p>Ensure the class type is used as the signal owner type.</p>
+
+          </li>
+          <li><p>Append the suffix <tt>&#39;Signal&#39;</tt> to the static member name.</p>
+
+          </li>
+          <li><p>Define a public getter which binds the static signal to the instance. This getter should contain no logic outside of binding the signal.</p>
+
+          </li>
+          <li><p>The name of the getter should be the same as the name of the
+          static signal minus the <tt>&#39;Signal&#39;</tt> suffix.</p>
+
+          </li>
+          <li><p>Consumers should normally use the getter to access the signal, but meta tools and code generators are free to use the static API directly. This is why the getter must be a pure delegate as described above.</p>
+
+          </li>
+        </ul>
+        <pre><code class="typescript">
+import { ISignal, Signal } from &#39;phosphor-signaling&#39;;
+
+
+class MyClass {
+
+  static valueChangedSignal = new Signal&lt;MyClass, number&gt;();
+
+  constructor(name: string) {
+    this._name = name;
+  }
+
+  get valueChanged(): ISignal&lt;MyClass, number&gt; {
+    return MyClass.valueChangedSignal.bind(this);
+  }
+
+  get name(): string {
+    return this._name;
+  }
+
+  get value(): number {
+    return this._value;
+  }
+
+  set value(value: number) {
+    if (value !== this._value) {
+      this._value = value;
+      this.valueChanged.emit(value);
+    }
+  }
+
+  private _name: string;
+  private _value = 0;
+}
+
+
+class MyHandler {
+
+  constructor(model: MyClass, name: string) {
+    this._model = model;
+    this._name = name;
+    model.valueChanged.connect(this._onValueChanged, this);
+  }
+
+  dispose(): void {
+    this._model.valueChanged.disconnect(this._onValueChanged, this);
+    this._model = null;
+  }
+
+  private _onValueChanged(sender: MyClass, value: number): void {
+    console.log(this._name, value);
+  }
+
+  private _name: string;
+  private _model: MyClass;
+}
+
+
+function logger(sender: MyClass, value: number): void {
+  console.log(sender.name, value);
+}
+
+
+var m1 = new MyClass(&#39;foo&#39;);
+var m2 = new MyClass(&#39;bar&#39;);
+
+m1.valueChanged.connect(logger);
+m2.valueChanged.connect(logger);
+
+var h1 = new MyHandler(m1, &#39;ham&#39;);
+var h2 = new MyHandler(m2, &#39;eggs&#39;);
+
+m1.value = 42;  // logs: foo 42, ham 42
+m2.value = 17;  // logs: bar 17, eggs 17
+        </code></pre>
+
+        <p>When defining a signal for use by instances of a <strong>different</strong> class:</p>
+
+        <ul>
+          <li><p>Define the signal as a static member of the class.</p>
+
+          </li>
+          <li><p>Ensure the instance type is used as the signal owner type.</p>
+
+          </li>
+          <li><p>Append the suffix <tt>&#39;Signal&#39;</tt> to the static member name.</p>
+
+          </li>
+          <li><p>Define a static method to get the bound signal for a particular instance of the owner type. This method should contain no logic outside of binding the signal.</p>
+
+          </li>
+          <li><p>Name the static method by prepending <tt>&#39;get&#39;</tt> to
+          the capitalized signal name. Omit the <tt>&#39;Signal&#39;</tt> suffix.</p>
+
+          </li>
+          <li><p>Consumers should normally use the static method to access the bound signal, but meta tools and code generators are free to use the static API directly. This is why the method must be a pure delegate as described above.</p>
+
+          </li>
+        </ul>
+        <p>This pattern is referred to as an <em>attached signal</em>. The signal is defined by one class, but the sender is a foreign instance. This pattern is useful when creating container objects which must emit signals for child objects in a way which doesn&#39;t require polluting the child class with extraneous signal definitions.</p>
+
+        <pre><code class="typescript">
+class MyItem {
+  // ...
+}
+
+
+class MyContainer {
+
+  static valueChangedSignal = new Signal&lt;MyItem, number&gt;();
+
+  static getValueChanged(item: MyItem): ISignal&lt;MyItem, number&gt; {
+    return MyContainer.valueChangedSignal.bind(item);
+  }
+
+  getValue(item: MyItem): number {
+    // ...
+  }
+
+  setValue(item: MyItem, value: number): void {
+    // ...
+    MyContainer.getValueChanged(item).emit(value);
+  }
+}
+        </code></pre>
+
+        <p><strong>Auxiliary API:</strong></p>
+
+        <pre><code class="typescript">
+import {
+  clearSignalData, disconnectReceiver, disconnectSender
+} from &#39;phosphor-signaling&#39;;
+
+
+// Disconnect a handler from all models in a single-shot.
+disconnectReceiver(handler);
+
+// Disconnect a particular model from all handlers in a single-shot.
+disconnectSender(model);
+
+// disconnect everything - sender *and* receiver
+clearSignalData(model);
+        </code></pre>
+      </section>
+
+      <section>
+        <h2>API</h2>
+
+        <p><a href="http://phosphorjs.github.io/phosphor-signaling/api/">API Docs</a></p>
+
+      </section>
+    </article>
+
+    <aside>
+      <div class="logo"></div>
+      <h2>PhosphorJS</h2>
+      <p>a collection of libraries <br>
+      designed  to make it easy<br>
+      to build high-performance,<br>
+      pluggable, desktop-style <br>
+      web applications</p>
+    </aside>
+
+  </div> <!-- #main -->
+</div> <!-- #main-container -->
+
+<!-- <div class="footer-container">
+            <footer class="wrapper">
+                <h3>footer</h3>
+            </footer>
+        </div> -->
+
+<script src="js/main.js"></script>
+</body>
+</html>

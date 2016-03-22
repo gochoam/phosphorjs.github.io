@@ -3,3 +3,5 @@ node_modules
 build
 examples/*/bundle.js
 examples/*/index.js
+index-redux/md-source/
+*.swp

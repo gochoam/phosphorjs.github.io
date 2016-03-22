@@ -1,0 +1,282 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>PhosphorJS: Observable List</title>
+<meta name="description" content="PhosphorJS">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="favicon.ico">
+<link href='https://fonts.googleapis.com/css?family=Lato:400italic,300,300italic' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Nunito:300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="css/normalize.min.css">
+<link rel="stylesheet" href="css/main.css">
+
+<link rel="stylesheet" href="highlight/styles/paraiso-light.css">
+<script src="highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+<!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+            <script>window.html5 || document.write('<script src="js/vendor/html5shiv.js"><\/script>')</script>
+        <![endif]-->
+</head>
+<body>
+
+<div class="header-container">
+  <header class="wrapper clearfix">
+    <a href="index.html">
+      <div class="logo"></div>
+      <h1 class="title">PhosphorJS</h1>
+    </a>
+    <nav>
+      <ul>
+        <li><a href="https://github.com/phosphorjs/">GitHub</a></li>
+        <li><a href="quickstart.html">Quickstart</a></li> 
+        <li><a href="tutorials.html">Tutorials</a></li>
+        <li><a href="examples.html">Examples</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+  </header>
+</div>
+
+<div class="main-container">
+  <div class="main wrapper clearfix">
+    <article>
+      <heading>
+      <h1>Observable List</h1>
+      </heading>
+
+      <p>This module provides a sequence container which can be observed for changes.
+      Additional methods are included to to manipulate lists, insert and move
+      elements.</p>
+
+      <section>
+        <h2>Supported Runtimes</h2>
+
+        <p>The runtime versions which are currently <em>known to work</em> are listed
+        below. Earlier versions may also work, but come with no guarantees.</p>
+
+        <ul>
+          <li>Node 0.12.7+</li>
+          <li>IE 11+</li>
+          <li>Firefox 32+</li>
+          <li>Chrome 38+</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Bundle for the Browser</h2>
+
+        <p>Any bundler that understands how to <tt>require()</tt> files with .js and
+        .css extensions can be used with this package.</p>
+      </section>
+
+      <section>
+        <h2>Usage Examples</h2>
+
+        <p><strong>Note:</strong> This module is fully compatible with
+        Node/Babel/ES6/ES5. Simply omit the type declarations when using a language
+        other than TypeScript.</p>
+
+        <p>To test the <tt>phosphor-observablelist</tt> module in a node interactive
+        shell after the installation, open a terminal in your current working directory
+        and run:</p>
+
+        <pre><code class="bash">node
+        </code></pre>
+
+        <p>Then import the module into node with the following command:</p>
+
+        <pre><code class="bash">
+&gt; observablelist = require(&#39;phosphor-observablelist&#39;);
+        </code></pre>
+
+        <p>The <tt>ObservableList()</tt> constructor can now be used to create new
+        lists:</p>
+
+        <pre><code class="bash">
+&gt; let list = new observablelist.ObservableList([1, 1, 2, 3, 5, 8]);
+
+&gt; let strlist = new observablelist.ObservableList([&#39;f&#39;, &#39;i&#39;, &#39;b&#39;, &#39;j&#39;]);
+        </code></pre>
+
+        <p>Two basic methods of Observable Lists are <tt>get()</tt> and <tt>set()</tt>.
+        The <tt>get()</tt> method retrieves a value at a specific index, if the index
+        is negative it offsets from the end of the list, indexes out of range return
+        <tt>undefined</tt>. The <tt>set()</tt> method, on the other hand, sets the
+        value of an item at a given position, the same index rules apply in this
+        case.</p>
+
+        <pre><code class="bash">
+&gt; list.get(4)
+5
+&gt; list.get(-2)
+5
+&gt; list.get(100)
+undefined
+
+&gt; list.set(1, 5)
+1
+&gt; list.set(-2, 8)
+5
+
+&gt; list
+[ 1, 5, 2, 3, 8, 8 ]
+        </code></pre>
+
+        <p>There are other methods to retrieve information about the elements in
+        Observable Lists: <tt>indexOf()</tt> looks for its argument in the list and
+        returns the index of the first occurrence, <tt>contains()</tt> returns
+        <tt>true</tt> if it the given argument is in the list and <tt>false</tt>
+        otherwise.</p>
+
+        <pre><code class="bash">
+&gt; let strlist1 = new obslist.ObservableList([&#39;f&#39;, &#39;i&#39;, &#39;b&#39;, &#39;j&#39;]);
+
+&gt; strlist.indexOf(&#39;b&#39;);
+2
+&gt; strlist.indexOf(&#39;p&#39;);
+-1
+
+&gt; strlist.contains(&#39;b&#39;);
+true
+&gt; strlist.contains(&#39;p&#39;);
+false
+        </code></pre>
+
+        <p>Observable Lists also support slicing by means of the <tt>slice()</tt>
+        method which takes up to 2 arguments. If no argument is passed it returns a
+        copy of the list, if only one argument is passed it returns a slice from that
+        index to the end of the list, two arguments determine the lower and upper
+        indexes for the slice.</p>
+
+        <pre><code class="bash">
+&gt; let list = new obslist.ObservableList([1, 2, 3, 1, 2, 3]);
+
+&gt; list.slice()
+[ 1, 2, 3, 1, 2, 3 ]
+&gt; list.slice(2)
+[ 3, 1, 2, 3 ]
+&gt; list.slice(1)
+[ 2, 3, 1, 2, 3 ]
+&gt; list.slice(-1)
+[ 3 ]
+&gt; list.slice(1, -1)
+[ 2, 3, 1, 2 ]
+        </code></pre>
+
+        <p>To alter an <tt>ObservableList</tt> the method names are somewhat
+        self-descriptive. <tt>add()</tt> adds a new item and returns its index,
+        <tt>move()</tt> takes two arguments and moves the element at the fist position
+        to the second position returning <tt>true</tt> if the operation was successful.
+        To remove the first occurrence of a given value use <tt>remove()</tt> which
+        will return the corresponding index, if any. Elements at a specific position
+        are removed by <tt>removeAt()</tt>, which takes as argument the index, removes
+        it and returns the deleted element. To clear a list and delete the elements
+        altogether use <tt>clear()</tt>.</p>
+
+        <pre><code class="bash">
+&gt; let list = new obslist.ObservableList([1, 2, 3, 1, 2, 3]);
+
+&gt; list.add(5);
+6
+&gt; list;
+[ 1, 2, 3, 1, 2, 3, 5 ]
+
+&gt; list.move(1, -1)
+true
+&gt; list
+[ 1, 3, 1, 2, 3, 5, 2 ]
+
+&gt; list.remove(3);
+1
+&gt; list
+[ 1, 1, 2, 3, 5, 2 ]
+&gt; list.removeAt(-1);
+2
+&gt; list;
+[ 1, 1, 2, 3, 5 ]
+
+&gt; list.clear();
+[ 1, 1, 2, 3, 5 ]
+&gt; list
+[]
+        </code></pre>
+
+        <p>The main advantage of using  the <tt>ObservableList</tt> object is that the
+        resulting object can be observed for changes. To do this you have to hook a
+        callable up to the <tt>changed</tt> signal. For instance, we can use a Boolean
+        variable <tt>called</tt> to check whether or not the list has been changed:</p>
+
+        <pre><code class="bash">
+&gt; let list = new obslist.ObservableList([1, 2, 3, 4, 1, 2, 3]);
+
+&gt; let called = false;
+&gt; list.changed.connect(() =&gt; { called = true; });
+
+&gt; called
+false
+&gt; list.insert(0, 5);
+0
+&gt; called
+true
+        </code></pre>
+
+        <p>This basic monitoring can be further expanded, you can use the arguments
+        passed by default to the callable:</p>
+
+        <pre><code class="bash">
+&gt; list.changed.connect((sender, args) =&gt; {
+... console.log(args.type);
+... console.log(args.newIndex);
+... console.log(args.newValue);
+... console.log(args.oldIndex);
+... console.log(args.oldValue);
+... });
+
+&gt; list.add(9);
+0
+8
+9
+-1
+undefined
+8
+        </code></pre>
+      </section>
+
+      <section>
+        <h2 id="api">API</h2>
+
+        <p><a href="http://phosphorjs.github.io/phosphor-observablelist/api/">API Docs</a></p>
+
+      </section>
+    </article>
+
+    <aside>
+      <div class="logo"></div>
+      <h2>PhosphorJS</h2>
+      <p>a collection of libraries <br>
+      designed  to make it easy<br>
+      to build high-performance,<br>
+      pluggable, desktop-style <br>
+      web applications</p>
+    </aside>
+
+  </div> <!-- #main -->
+</div> <!-- #main-container -->
+
+<!-- <div class="footer-container">
+            <footer class="wrapper">
+                <h3>footer</h3>
+            </footer>
+        </div> -->
+
+<script src="js/main.js"></script>
+</body>
+</html>

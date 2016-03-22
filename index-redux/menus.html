@@ -1,0 +1,293 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>PhosphorJS: Menus</title>
+<meta name="description" content="PhosphorJS">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="favicon.ico">
+<link href='https://fonts.googleapis.com/css?family=Lato:400italic,300,300italic' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Nunito:300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="css/normalize.min.css">
+<link rel="stylesheet" href="css/main.css">
+
+<link rel="stylesheet" href="highlight/styles/paraiso-light.css">
+<script src="highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+<!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+            <script>window.html5 || document.write('<script src="js/vendor/html5shiv.js"><\/script>')</script>
+        <![endif]-->
+</head>
+<body>
+
+<div class="header-container">
+  <header class="wrapper clearfix">
+    <a href="index.html">
+      <div class="logo"></div>
+      <h1 class="title">PhosphorJS</h1>
+    </a>
+    <nav>
+      <ul>
+        <li><a href="https://github.com/phosphorjs/">GitHub</a></li>
+        <li><a href="quickstart.html">Quickstart</a></li> 
+        <li><a href="tutorials.html">Tutorials</a></li>
+        <li><a href="examples.html">Examples</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+  </header>
+</div>
+
+<div class="main-container">
+  <div class="main wrapper clearfix">
+    <article>
+      <heading>
+      <h1>Menus</h1>
+      </heading>
+      <section>
+        <p>This module provides phosphor widgets for creating menus, contextual menus and menu bars. The user can customize each menu entry, assign a keyboard shortcut and an icon.</p>
+      </section>
+
+      <section>
+        <h2>Supported Runtimes</h2>
+
+        <p>The runtime versions which are currently <em>known to work</em> are listed below. Earlier versions may also work, but come with no guarantees.</p>
+
+        <ul>
+          <li>IE 11+</li>
+          <li>Firefox 32+</li>
+          <li>Chrome 38+</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Bundle for the Browser</h2>
+
+        <p>Any bundler that understands how to <tt>require()</tt> files with <tt>.js</tt> and <tt>.css</tt> extensions can be used with this package.</p>
+      </section>
+
+      <section>
+        <h2>Usage Examples</h2>
+
+        <p><strong>Note:</strong> This module is fully compatible with Node/Babel/ES6/ES5. Simply omit the type declarations when using a language other than TypeScript.</p>
+
+        <p>The basic constructor to create a new menu is <tt>Menu()</tt>, which takes as argument a list of menu items. Many components of each <tt>MenuItem</tt> can be further customized: the <tt>text</tt> to show in the corresponding menu entry, a keyboard <tt>shortcut</tt>, an event <tt>handler</tt> and an <tt>icon</tt>.</p>
+
+        <p>There are special menu items that provide extra flexibility. A <tt>.Separator</tt> inserts a line between adjacent menu items for a better visual organization. It is also possible to create a <tt>submenu</tt> to display a new <tt>Menu</tt> instance inside a menu item.</p>
+
+        <pre><code class="typescript">
+import {
+  Menu, MenuBar, MenuItem
+} from &#39;phosphor-menus&#39;;
+
+// Handlers for the clicking events
+let logHandler = (item: MenuItem) =&gt; {
+  var node = document.getElementById(&#39;log-span&#39;);
+  node.textContent = item.text.replace(/&amp;/g, &#39;&#39;);
+};
+
+// File menu
+let fileMenu = new Menu([
+  new MenuItem({
+    text: &#39;New File&#39;,
+    shortcut: &#39;Ctrl+N&#39;,
+    handler: logHandler,
+  }),
+  new MenuItem({
+    text: &#39;Open File&#39;,
+    shortcut: &#39;Ctrl+O&#39;,
+    handler: logHandler,
+  }),
+  new MenuItem({
+    text: &#39;Save File&#39;,
+    shortcut: &#39;Ctrl+S&#39;,
+    handler: logHandler,
+  }),
+  new MenuItem({
+    type: MenuItem.Separator
+  }),
+  new MenuItem({
+    text: &#39;Close File&#39;,
+    shortcut: &#39;Ctrl+W&#39;,
+    handler: logHandler,
+  }),
+
+    // Submenu
+  new MenuItem({
+    text: &#39;More...&#39;,
+    submenu: new Menu([
+      new MenuItem({
+        text: &#39;One&#39;,
+        handler: logHandler,
+      }),
+      new MenuItem({
+        text: &#39;Two&#39;,
+        handler: logHandler,
+      })
+    ])
+  })
+]);
+
+// Edit Menu
+let editMenu = new Menu([
+  new MenuItem({
+    text: &#39;&amp;Undo&#39;,
+    icon: &#39;fa fa-undo&#39;,
+    shortcut: &#39;Ctrl+Z&#39;,
+    handler: logHandler,
+  }),
+  new MenuItem({
+    type: MenuItem.Separator
+  }),
+  new MenuItem({
+    text: &#39;&amp;Copy&#39;,
+    icon: &#39;fa fa-copy&#39;,
+    shortcut: &#39;Ctrl+C&#39;,
+    handler: logHandler,
+  }),
+  new MenuItem({
+    text: &#39;Cu&amp;t&#39;,
+    icon: &#39;fa fa-cut&#39;,
+    shortcut: &#39;Ctrl+X&#39;,
+    handler: logHandler,
+  }),
+  new MenuItem({
+    text: &#39;&amp;Paste&#39;,
+    icon: &#39;fa fa-paste&#39;,
+    shortcut: &#39;Ctrl+V&#39;,
+    handler: logHandler,
+  })
+]);
+        </code></pre>
+
+        <p>The menus created in the previous snippet can now be grouped into a main bar. This is accomplished with the <tt>menuBar</tt> constructor, a list of menu items is passed as argument.</p>
+
+        <pre><code class="typescript">
+// Main Menu Bar
+let menuBar = new MenuBar([
+  new MenuItem({
+    text: &#39;File&#39;,
+    submenu: fileMenu
+  }),
+  new MenuItem({
+    text: &#39;Edit&#39;,
+    submenu: editMenu
+  }),
+  new MenuItem({
+    type: MenuItem.Separator
+  }),
+  new MenuItem({
+    text: &#39;View&#39;,
+    type: MenuItem.Submenu
+  })
+]);
+        </code></pre>
+
+        <p>Context menus are also supported by this module by means of the <tt>contextMenu</tt> constructor. The syntax is the same as for regular menus and menu bars.</p>
+
+        <p>The following example also shows two additional features of menu items: the possibility of disabling an item with the <tt>disabled</tt> flag, and the <tt>checked</tt> flag to change the state of the item.</p>
+
+        <pre><code class="typescript">
+// Context Menu
+let contextMenu = new Menu([
+  new MenuItem({
+    text: &#39;&amp;Copy&#39;,
+    icon: &#39;fa fa-copy&#39;,
+    shortcut: &#39;Ctrl+C&#39;,
+    handler: logHandler,
+  }),
+  new MenuItem({
+    text: &#39;Cu&amp;t&#39;,
+    icon: &#39;fa fa-cut&#39;,
+    shortcut: &#39;Ctrl+X&#39;,
+    handler: logHandler,
+  }),
+  new MenuItem({
+    text: &#39;&amp;Paste&#39;,
+    icon: &#39;fa fa-paste&#39;,
+    shortcut: &#39;Ctrl+V&#39;,
+    handler: logHandler,
+  }),
+  new MenuItem({
+    type: MenuItem.Separator
+  }),
+  new MenuItem({
+    text: &#39;Task Manager&#39;,
+    disabled: true,
+    handler: logHandler,
+  }),
+  new MenuItem({
+    type: MenuItem.Separator
+  }),
+  new MenuItem({
+    text: &#39;More...&#39;,
+    submenu: new Menu([
+      new MenuItem({
+        text: &#39;One&#39;,
+        handler: logHandler,
+      }),
+      new MenuItem({
+        text: &#39;Two&#39;,
+        handler: logHandler,
+      })
+    ])
+  }),
+  new MenuItem({
+    type: MenuItem.Separator
+  }),
+  new MenuItem({
+    text: &#39;Close&#39;,
+    icon: &#39;fa fa-close&#39;,
+    handler: logHandler,
+  })
+]);
+
+document.addEventListener(&#39;contextmenu&#39;, (event: MouseEvent) =&gt; {
+  event.preventDefault();
+  let x = event.clientX;
+  let y = event.clientY;
+  contextMenu.popup(x, y);
+});
+
+window.onload = () =&gt; { 
+    menuBar.attach(document.getElementById(&#39;menubar-host&#39;));
+}
+        </code></pre>
+      </section>
+
+      <section>
+        <h2>API</h2>
+
+        <p><a href="http://phosphorjs.github.io/phosphor-menus/api/">API Docs</a></p>
+      </section>
+    </article>
+
+    <aside>
+      <div class="logo"></div>
+      <h2>PhosphorJS</h2>
+      <p>a collection of libraries <br>
+      designed  to make it easy<br>
+      to build high-performance,<br>
+      pluggable, desktop-style <br>
+      web applications</p>
+    </aside>
+
+  </div> <!-- #main -->
+</div> <!-- #main-container -->
+
+<!-- <div class="footer-container">
+            <footer class="wrapper">
+                <h3>footer</h3>
+            </footer>
+        </div> -->
+
+<script src="js/main.js"></script>
+</body>
+</html>

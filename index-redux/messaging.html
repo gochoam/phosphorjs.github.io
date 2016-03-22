@@ -1,0 +1,303 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>PhosphorJS: Messaging</title>
+<meta name="description" content="PhosphorJS">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="favicon.ico">
+<link href='https://fonts.googleapis.com/css?family=Lato:400italic,300,300italic' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Nunito:300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="css/normalize.min.css">
+<link rel="stylesheet" href="css/main.css">
+
+<link rel="stylesheet" href="highlight/styles/paraiso-light.css">
+<script src="highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+<!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+            <script>window.html5 || document.write('<script src="js/vendor/html5shiv.js"><\/script>')</script>
+        <![endif]-->
+</head>
+<body>
+
+<div class="header-container">
+  <header class="wrapper clearfix">
+    <a href="index.html">
+      <div class="logo"></div>
+      <h1 class="title">PhosphorJS</h1>
+    </a>
+    <nav>
+      <ul>
+        <li><a href="https://github.com/phosphorjs/">GitHub</a></li>
+        <li><a href="quickstart.html">Quickstart</a></li> 
+        <li><a href="tutorials.html">Tutorials</a></li>
+        <li><a href="examples.html">Examples</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+  </header>
+</div>
+
+<div class="main-container">
+  <div class="main wrapper clearfix">
+    <article>
+      <heading>
+      <h1>Messaging</h1>
+      </heading>
+      <section>
+        <p>A module for inter-object message passing.</p>
+      </section>
+
+      <section>
+        <h2>Supported Runtimes</h2>
+
+        <p>The runtime versions which are currently <em>known to work</em> are listed below. Earlier versions may also work, but come with no guarantees.</p>
+
+        <ul>
+          <li>Node 0.12.7+</li>
+          <li>IE 11+</li>
+          <li>Firefox 32+</li>
+          <li>Chrome 38+</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Bundle for the Browser</h2>
+
+        <p>Any bundler that understands how to <tt>require()</tt> files with .js and .css extensions can be used with this package.</p>
+      </section>
+
+      <section>
+        <h2>Usage Examples</h2>
+
+        <p><strong>Note:</strong> This module is fully compatible with Node/Babel/ES6/ES5. Simply omit the type declarations when using a language other than TypeScript.</p>
+
+        <p><strong>Send a message to a message handler for immediate processing:</strong></p>
+
+        <p>The <tt>sendMessage</tt> function delivers the messages synchronously, for immediate processing by the message handler.</p>
+
+        <pre><code class="typescript">
+import { IMessageHandler, Message, sendMessage } from &#39;phosphor-messaging&#39;;
+
+
+class Handler implements IMessageHandler {
+
+  processMessage(msg: Message): void {
+    console.log(msg.type);
+  }
+}
+
+let handler = new Handler();
+sendMessage(handler, new Message(&#39;one&#39;));    // logs &#39;one&#39;
+sendMessage(handler, new Message(&#39;two&#39;));     // logs &#39;two&#39;
+sendMessage(handler, new Message(&#39;three&#39;));  // logs &#39;three&#39;
+        </code></pre>
+
+        <p><strong>Post a message to a message handler for future processing:</strong></p>
+
+        <p>The <tt>postMessage</tt> function delivers the messages asynchronously, for processing by the message handler on the next cycle of the event loop.</p>
+
+        <pre><code class="typescript">
+import { postMessage } from &#39;phosphor-messaging&#39;;
+
+
+postMessage(handler, new Message(&#39;one&#39;));
+postMessage(handler, new Message(&#39;two&#39;));
+postMessage(handler, new Message(&#39;three&#39;));
+
+// sometime later: logs &#39;one&#39;, &#39;two&#39;, then &#39;three&#39;.
+        </code></pre>
+
+        <p><strong>Create custom messages which hold extra data:</strong></p>
+
+        <pre><code class="typescript">
+class ValueMessage extends Message {
+
+  constructor(value: number) {
+    super(&#39;value&#39;);
+    this._value = value;
+  }
+
+  get value(): number {
+    return this._value;
+  }
+
+  private _value: number;
+}
+
+
+class ValueHandler extends Handler {
+
+  processMessage(msg: Message): void {
+    if (msg.type === &#39;value&#39;) {
+      console.log(&#39;value: &#39;, (&lt;ValueMessage&gt;msg).value);
+    } else {
+      super.processMessage(msg);
+    }
+  }
+}
+
+
+let handler = new ValueHandler();
+sendMessage(handler, new Message(&#39;one&#39;));    // logs &#39;one&#39;
+postMessage(handler, new Message(&#39;two&#39;));
+sendMessage(handler, new ValueMessage(42));  // logs 42
+postMessage(handler, new ValueMessage(43));
+
+// sometime later: logs &#39;two&#39; then 43
+        </code></pre>
+
+        <p><strong>Compress posted messages to reduce duplicate work:</strong></p>
+
+        <pre><code class="typescript">
+import { Queue } from &#39;phosphor-queue&#39;;
+
+
+class ExpensiveWorker extends Handler {
+
+  processMessage(msg: Message): void {
+    if (msg.type === &#39;expensive&#39;) {
+      console.log(&#39;do something expensive&#39;);
+    } else {
+      super.processMessage(msg);
+    }
+  }
+
+  compressMessage(msg: Message, pending: Queue&lt;Message&gt;): boolean {
+    if (msg.type === &#39;expensive&#39;) {
+       return pending.some(other =&gt; other.type === &#39;expensive&#39;);
+    }
+    return false;
+  }
+}
+
+
+let handler = new ExpensiveWorker();
+postMessage(handler, new Message(&#39;one&#39;));
+postMessage(handler, new Message(&#39;expensive&#39;));
+postMessage(handler, new Message(&#39;two&#39;));
+postMessage(handler, new Message(&#39;expensive&#39;));
+postMessage(handler, new Message(&#39;expensive&#39;));
+postMessage(handler, new Message(&#39;three&#39;));
+postMessage(handler, new Message(&#39;expensive&#39;));
+
+// sometime later: logs &#39;one&#39;, &#39;do something expensive&#39;, &#39;two&#39;, then &#39;three&#39;
+        </code></pre>
+
+        <p><strong>Test for, and preemptively deliver, posted messages:</strong></p>
+
+        <pre><code class="typescript">
+import { hasPendingMessages, sendPendingMessage } from &#39;phosphor-messaging&#39;;
+
+
+postMessage(handler, new Message(&#39;one&#39;));
+postMessage(handler, new Message(&#39;two&#39;));
+postMessage(handler, new Message(&#39;three&#39;));
+
+hasPendingMessages(handler);  // true
+
+sendPendingMessage(handler);  // logs &#39;one&#39;
+sendPendingMessage(handler);  // logs &#39;two&#39;
+
+// sometime later: logs &#39;three&#39;.
+        </code></pre>
+
+        <p><strong>Install message filters to spy on or restrict message processing:</strong></p>
+
+        <pre><code class="typescript">
+import {
+  IMessageFilter, installMessageFilter, removeMessageFilter
+} from &#39;phosphor-messaging&#39;;
+
+
+class MessageSpy implements IMessageFilter {
+
+  filterMessage(handler: IMessageHandler, msg: Message): boolean {
+      console.log(&#39;spy:&#39;, msg.type);
+      return false;
+  }
+}
+
+
+class FilterTwo implements IMessageFilter {
+
+  filterMessage(handler: IMessageHandler, msg: Message): boolean {
+      return msg.type === &#39;two&#39;;
+  }
+}
+
+
+let handler = new Handler();
+let spy = new MessageSpy();
+let filter = new FilterTwo();
+
+sendMessage(handler, new Message(&#39;two&#39;));  // logs &#39;two&#39;
+
+installMessageFilter(handler, spy);
+
+sendMessage(handler, new Message(&#39;two&#39;));  // logs &#39;spy: two&#39;, then &#39;two&#39;
+
+installMessageFilter(handler, filter);
+
+sendMessage(handler, new Message(&#39;two&#39;));  // logs nothing
+
+installMessageFilter(handler, spy);
+
+sendMessage(handler, new Message(&#39;two&#39;));  // logs &#39;spy: two&#39;
+
+removeMessageFilter(handler, filter);
+
+sendMessage(handler, new Message(&#39;two&#39;));  // logs &#39;spy: two&#39;, &#39;spy: two&#39;, then &#39;two&#39;
+
+removeMessageFilter(handler, spy);
+
+sendMessage(handler, new Message(&#39;two&#39;));  // logs &#39;two&#39;
+        </code></pre>
+
+        <p><strong>Clear all message data associated with a handler:</strong></p>
+
+        <pre><code class="typescript">
+import { clearMessageData } from &#39;phosphor-messaging&#39;;
+
+
+// clear everything - posted messages *and* filters
+clearMessageData(handler);
+        </code></pre>
+      </section>
+
+      <section>
+        <h2>API</h2>
+
+        <p><a href="http://phosphorjs.github.io/phosphor-messaging/api/">API Docs</a></p>
+      </section>
+    </article>
+
+    <aside>
+      <div class="logo"></div>
+      <h2>PhosphorJS</h2>
+      <p>a collection of libraries <br>
+      designed  to make it easy<br>
+      to build high-performance,<br>
+      pluggable, desktop-style <br>
+      web applications</p>
+    </aside>
+
+  </div> <!-- #main -->
+</div> <!-- #main-container -->
+
+<!-- <div class="footer-container">
+            <footer class="wrapper">
+                <h3>footer</h3>
+            </footer>
+        </div> -->
+
+<script src="js/main.js"></script>
+</body>
+</html>
