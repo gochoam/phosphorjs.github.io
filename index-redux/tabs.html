@@ -1,0 +1,148 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>PhosphorJS: Tabs</title>
+<meta name="description" content="PhosphorJS">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="favicon.ico">
+<link href='https://fonts.googleapis.com/css?family=Lato:400italic,300,300italic' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Nunito:300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="css/normalize.min.css">
+<link rel="stylesheet" href="css/main.css">
+
+<link rel="stylesheet" href="highlight/styles/paraiso-light.css">
+<script src="highlight/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+
+<!--[if lt IE 9]>
+            <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+            <script>window.html5 || document.write('<script src="js/vendor/html5shiv.js"><\/script>')</script>
+        <![endif]-->
+</head>
+<body>
+
+<div class="header-container">
+  <header class="wrapper clearfix">
+    <a href="index.html">
+      <div class="logo"></div>
+      <h1 class="title">PhosphorJS</h1>
+    </a>
+    <nav>
+      <ul>
+        <li><a href="https://github.com/phosphorjs/">GitHub</a></li>
+        <li><a href="quickstart.html">Quickstart</a></li> 
+        <li><a href="tutorials.html">Tutorials</a></li>
+        <li><a href="examples.html">Examples</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </nav>
+  </header>
+</div>
+
+<div class="main-container">
+  <div class="main wrapper clearfix">
+    <article>
+      <heading>
+      <h1>Tabs</h1>
+      </heading>
+      <section>
+        <p>Phosphor widgets for creating tab bars and tab panels. The resulting layout shows a set of tabs that can be rearranged graphically by the user, displaying a title and a &quot;close&quot; button.</p>
+      </section>
+
+      <section>
+        <h2>Supported Runtimes</h2>
+
+        <p>The runtime versions which are currently <em>known to work</em> are listed below. Earlier versions may also work, but come with no guarantees.</p>
+
+        <ul>
+          <li>IE 11+</li>
+          <li>Firefox 32+</li>
+          <li>Chrome 38+</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Bundle for the Browser</h2>
+
+        <p>Any bundler that understands how to <tt>require()</tt> files with <tt>.js</tt> and <tt>.css</tt> extensions can be used with this package.</p>
+      </section>
+
+      <section>
+        <h2>Usage Examples</h2>
+
+        <p><strong>Note:</strong> This module is fully compatible with Node/Babel/ES6/ES5. Simply omit the type declarations when using a language other than TypeScript.</p>
+
+        <p>The <tt>phosphor-tabs</tt> module provides two constructors: <tt>TabBar</tt> and <tt>TabPanel</tt>. A tab bar displays several items as a row of tabs. A tab panel combines a <tt>TabBar</tt> and a <tt>StackedPanel</tt> to handle the common case of a tab bar placed above a content area. The selected tab controls the widget which is shown in the content area.</p>
+
+        <p>The following snippet imports the required modules and creates some content. The title is displayed in each tab followed by a &quot;x&quot; icon to close the corresponding tab.</p>
+
+        <pre><code class="typescript">import {
+  TabPanel
+} from &#39;phosphor-tabs&#39;;
+
+import {
+  Widget
+} from &#39;phosphor-widget&#39;;
+
+let one = new Widget();
+one.title.text = &#39;One&#39;;
+
+let two = new Widget();
+two.title.text = &#39;Two&#39;;
+
+let three = new Widget();
+three.title.text = &#39;Three&#39;;
+        </code></pre>
+
+        <p>The <tt>.addChild()</tt> method adds content to the <tt>TabPanel</tt>, it takes as argument a widget. Additionally it is possible to make the tabs movable, allowing drag-and-drop  making the interface more dynamic. This can be switched on and off assigning a boolean to <tt>.tabsMovable</tt>.</p>
+
+        <pre><code class="typescript">let panel = new TabPanel();
+panel.tabsMovable = true;
+panel.addChild(one);
+panel.addChild(two);
+panel.addChild(three);
+
+panel.attach(document.body);
+
+window.onresize = () =&gt; { panel.update(); };
+
+window.onload = () =&gt; { panel.attach(document.body); };
+        </code></pre>
+      </section>
+
+      <section>
+        <h2>API</h2>
+
+        <p><a href="http://phosphorjs.github.io/phosphor-tabs/api/">API Docs</a></p>
+
+      </section>
+    </article>
+
+    <aside>
+      <div class="logo"></div>
+      <h2>PhosphorJS</h2>
+      <p>a collection of libraries <br>
+      designed  to make it easy<br>
+      to build high-performance,<br>
+      pluggable, desktop-style <br>
+      web applications</p>
+    </aside>
+
+  </div> <!-- #main -->
+</div> <!-- #main-container -->
+
+<!-- <div class="footer-container">
+            <footer class="wrapper">
+                <h3>footer</h3>
+            </footer>
+        </div> -->
+
+<script src="js/main.js"></script>
+</body>
+</html>
